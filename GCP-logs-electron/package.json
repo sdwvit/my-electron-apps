@@ -1,0 +1,14 @@
+{
+  "name": "gcp-logs-electron",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "package": "electron-packager . GCP --platform=linux --arch=x64 --overwrite --icon=/home/sdwvit/Applications/applications/GCP.svg"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^32.0.1"
+  }
+}
