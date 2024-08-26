@@ -1,0 +1,14 @@
+{
+  "name": "gitlab-electron",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "package": "electron-packager . Gitlab --platform=linux --arch=x64 --overwrite --icon=/home/sdwvit/Applications/applications/Gitlab.svg"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^32.0.1"
+  }
+}
