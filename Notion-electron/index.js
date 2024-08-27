@@ -1,5 +1,6 @@
 function start(address, deps) {
   const { app, BrowserWindow, shell, Menu, MenuItem, clipboard } = deps;
+
   function createWindow(address) {
     const win = new BrowserWindow({
       width: 1024,
@@ -43,8 +44,23 @@ function start(address, deps) {
       menu.append(new MenuItem({ role: "cut", label: "Cut" }));
       menu.append(new MenuItem({ role: "copy", label: "Copy" }));
       menu.append(new MenuItem({ role: "paste", label: "Paste" }));
-
-      
+      menu.append(
+        new MenuItem({
+          click: () => {
+            createWindow(win.webContents.getURL());
+          },
+          label: "Duplicate window",
+        }),
+      );
+      menu.append(
+        new MenuItem({
+          label: "Copy Current Address",
+          click: () => {
+            clipboard.writeText(win.webContents.getURL());
+          },
+        }),
+      );
+      s;
       // Add "Copy Link Address" if a link is clicked
       if (params.linkURL) {
         menu.append(
