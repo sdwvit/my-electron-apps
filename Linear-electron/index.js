@@ -66,20 +66,7 @@ function start(address, deps) {
           click: () => {
             win.webContents.executeJavaScript(
               `(${(() => {
-                const type = {
-                  feat: "feature",
-                  chore: "chore",
-                  main: "maintenance",
-                  fix: "fix",
-                  f: "feature",
-                  c: "chore",
-                  m: "maintenance",
-                  i: "fix",
-                }[
-                  window
-                    .prompt("Ticket type? (F̲eat|C̲hore|M̲ain|fI̲x)")
-                    .toLowerCase()
-                ];
+                const type = "fix";
                 const sanitize = (str) =>
                   str.replace(/[^\w]/g, "-").replace(/-+/g, "-");
                 const allSpans = [...document.querySelectorAll("span")];
