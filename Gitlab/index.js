@@ -15,6 +15,7 @@ function start(address, deps) {
 
     win.webContents.on("will-navigate", handleExternalLinks);
     win.webContents.on("new-window", handleExternalLinks);
+
     // Add custom context menu
     win.webContents.on("context-menu", (event, params) => {
       const menu = new Menu();
@@ -47,6 +48,14 @@ function start(address, deps) {
       menu.append(
         new MenuItem({
           click: () => {
+            win.loadURL(address);
+          },
+          label: "Home page",
+        }),
+      );
+      menu.append(
+        new MenuItem({
+          click: () => {
             createWindow(win.webContents.getURL());
           },
           label: "Duplicate window",
@@ -60,7 +69,40 @@ function start(address, deps) {
           },
         }),
       );
-      s;
+      menu.append(
+        new MenuItem({
+          label: "Fill MR Name",
+          click: () => {
+            win.webContents.executeJavaScript(
+              `(${(() => {
+                const outputSelector =
+                  "[data-testid=issuable-form-title-field]";
+                const submitSelector = "[data-track-label=submit_mr]";
+                const bodySelector =
+                  "[data-testid=issuable-form-description-field]";
+                const input =
+                  document.querySelector(".branch-selector code") || {};
+                const output = document.querySelector(outputSelector) || {};
+                const issueBody = document.querySelector(bodySelector) || {};
+                const saveButton = document.querySelector(submitSelector);
+
+                let [user, type, domain, explanation, ticket] =
+                  input.innerText.split("/");
+                explanation = explanation.replaceAll("-", " ");
+                ticket = ticket.toLocaleUpperCase();
+                type = type[0].toLocaleUpperCase() + type.slice(1);
+                output.value = `${type}(${domain}): ${explanation}`;
+                issueBody.value = issueBody.value.replace(
+                  /Fixes LINEAR_ISSUE_ID/gi,
+                  `Fixes ${ticket}`,
+                );
+                saveButton.click();
+              }).toString()})()`,
+            );
+          },
+        }),
+      );
+
       // Add "Copy Link Address" if a link is clicked
       if (params.linkURL) {
         menu.append(
@@ -88,6 +130,7 @@ function start(address, deps) {
 
       menu.popup();
     });
+
     win.loadURL(address);
     return win;
   }
@@ -95,7 +138,12 @@ function start(address, deps) {
   function handleExternalLinks(event, url) {
     const win = BrowserWindow.getFocusedWindow();
 
-    if (url !== win.webContents.getURL() && !url.includes("auth")) {
+    if (
+      url !== win.webContents.getURL() &&
+      !url.includes("auth") &&
+      !url.includes("sign_in") &&
+      !url.includes("gitlab")
+    ) {
       event.preventDefault();
       shell.openExternal(url);
     }
@@ -116,4 +164,4 @@ function start(address, deps) {
   });
 }
 
-start("https://www.notion.so/", require("electron"));
+start("https://gitlab.com/", require("electron"));

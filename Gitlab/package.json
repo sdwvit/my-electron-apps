@@ -1,10 +1,10 @@
 {
-  "name": "chatgpt-electron",
+  "name": "gitlab-electron",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "package": "electron-packager . ChatGPT --platform=linux --arch=x64 --overwrite --icon=/home/sdwvit/Applications/applications/Openai.svg"
+    "package": "electron-packager --platform=linux --arch=x64 --overwrite ."
   },
   "author": "",
   "license": "ISC",

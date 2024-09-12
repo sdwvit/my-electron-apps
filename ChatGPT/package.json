@@ -1,10 +1,10 @@
 {
-  "name": "linear-electron",
+  "name": "chatgpt-electron",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "package": "electron-packager . Linear --platform=linux --arch=x64 --overwrite --icon=/home/sdwvit/Applications/applications/Linear.svg"
+    "package": "electron-packager --platform=linux --arch=x64 --overwrite ."
   },
   "author": "",
   "license": "ISC",

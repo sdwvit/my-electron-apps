@@ -1,10 +1,10 @@
 {
-  "name": "gcp-logs-electron",
+  "name": "notion-electron",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "package": "electron-packager . GCP --platform=linux --arch=x64 --overwrite --icon=/home/sdwvit/Applications/applications/GCP.svg"
+    "package": "electron-packager --platform=linux --arch=x64 --overwrite ."
   },
   "author": "",
   "license": "ISC",
