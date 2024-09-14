@@ -2,13 +2,15 @@
   "name": "gitlab-electron",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "bundle.js",
   "scripts": {
-    "package": "electron-packager --platform=linux --arch=x64 --overwrite ."
+    "package": "electron-packager --platform=linux --arch=x64 --overwrite .",
+    "prepackage": "rollup -c ../rollup.config.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^32.0.1"
+    "electron": "^32.0.1",
+    "electron-packager": "^17.1.2"
   }
 }

@@ -2,7 +2,10 @@
 
 # Get the current working directory
 root_dir=$(pwd)
-
+source ~/.profile
+source ~/.bashrc
+nvm use;
+npm i;
 # Loop through each subdirectory, one level deep
 for dir in */; do
     dir="${dir%/}"
