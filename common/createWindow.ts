@@ -27,6 +27,16 @@ export function createWindow(address: string, additionalContextMenu: any[]) {
     (event: Electron.Event<{}>, url: string) =>
       handleExternalLinks(event, url, win),
   );
+  // Inject middle-click handler into the loaded content
+  win.webContents.on("did-finish-load", () => {
+    win.webContents.executeJavaScript(`
+      window.addEventListener('auxclick', (event) => {
+        if (event.button === 1) {
+          window.ipcRenderer.send('open-new-window', { url: window.location.href });
+        }
+      });
+    `);
+  });
 
   // Custom context menu
   win.webContents.on("context-menu", (event, params) => {
@@ -47,7 +57,7 @@ export function createWindow(address: string, additionalContextMenu: any[]) {
     const { url } = params;
     const newWindow = createWindow(url, additionalContextMenu);
 
-    newWindow.loadURL(url || address); // Default to a URL if none provided
+    newWindow.loadURL(url || address);
   });
 
   win.loadURL(address);
