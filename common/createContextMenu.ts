@@ -21,6 +21,7 @@ export function createContextMenu(
       enabled: win.webContents.navigationHistory.canGoForward(),
     },
     { label: "Home page", click: () => win.loadURL(homeUrl) },
+    { label: "Refresh", click: () => win.loadURL(win.webContents.getURL()) },
     {
       label: "Duplicate window",
       click: () =>
