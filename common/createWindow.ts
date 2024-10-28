@@ -2,6 +2,7 @@ import { BrowserWindow, MenuItem, ipcMain } from "electron";
 import { addSearch } from "./addSearch";
 import { createContextMenu } from "./createContextMenu";
 import { handleExternalLinks } from "./handleExternalLinks";
+import { session } from "electron";
 
 export function createWindow(address: string, additionalContextMenu: any[]) {
   const win = new BrowserWindow({
@@ -58,6 +59,12 @@ export function createWindow(address: string, additionalContextMenu: any[]) {
     const newWindow = createWindow(url, additionalContextMenu);
 
     newWindow.loadURL(url || address);
+  });
+
+  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    details.requestHeaders["User-Agent"] =
+      "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
+    callback({ cancel: false, requestHeaders: details.requestHeaders });
   });
 
   win.loadURL(address);

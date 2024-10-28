@@ -51,4 +51,4 @@ async function start(address: string) {
   }
 }
 
-start("https://linear.app/");
+start("https://linear.app/noibu/team/NOI/all");
