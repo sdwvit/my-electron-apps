@@ -5,7 +5,7 @@ export function handleExternalLinks(
   url: string,
   win: BrowserWindow,
 ) {
-  if (url !== win.webContents.getURL() && !/auth|sign_in|gitlab|account/.test(url)) {
+  if (url !== win.webContents.getURL() && !/auth|sign_in|gitlab|account|chatgpt/.test(url)) {
     event.preventDefault();
     shell.openExternal(url);
   }
