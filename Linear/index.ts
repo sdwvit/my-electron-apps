@@ -16,7 +16,7 @@ async function start(address: string) {
 
   function generateScript() {
     return () => {
-      const type = "fix";
+      const types = ["fix", "feature", "maintenance", "chore"];
       const sanitize = (str: string) =>
         str.replace(/[^\w]/g, "-").replace(/-+/g, "-");
       const allSpans = [...document.querySelectorAll("span")];
@@ -27,13 +27,25 @@ async function start(address: string) {
         ...spanWithLabel.parentNode!.parentNode!.querySelectorAll("span"),
       ];
       const spanThatsNotLabel = parentSpans.filter(
-        (e) => !/(cycle|labels)/i.test(e.innerText),
-      )[0];
-      if (!spanThatsNotLabel) {
+        (e) => !/(cycle|labels)/i.test(e.innerText) && !!e.innerText,
+      );
+      if (!spanThatsNotLabel.length) {
         window.alert("Add at least 1 label");
         return;
       }
-      const domain = sanitize(spanThatsNotLabel.innerText);
+      const type =
+        spanThatsNotLabel
+          .filter((e) => types.includes(e.innerText.toLowerCase()))
+          .pop()?.innerText || "fix";
+      const domain = spanThatsNotLabel
+        .filter((e) => !types.includes(e.innerText.toLowerCase()))
+        .pop()?.innerText;
+
+      if (!domain) {
+        window.alert("Needs a project domain in labels");
+        return;
+      }
+
       const explanation = sanitize(
         document.querySelectorAll<HTMLDivElement>('*[aria-label*="title"]')[0]
           .innerText,
