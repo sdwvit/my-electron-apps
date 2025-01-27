@@ -17,7 +17,7 @@ async function start(address: string) {
   state.win = await commonAppLifecycle(address, customItems);
 
   async function assignReviewers() {
-    return; // todo skip for now
+    return new Promise((r) => setTimeout(r, 300)); // todo skip for now
     const reviewersIds = [13096912, 11109949];
     const reviewerSelector = (id: number) => `li[data-user-id="${id}"] > a`;
     const reviewersSelector = ".js-reviewer-search";
