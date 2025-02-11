@@ -51,7 +51,7 @@ async function start(address: string) {
           .innerText,
       );
 
-      const ticketCode = /NOI-\d+/g.exec(
+      const ticketCode = /ISS-\d+/g.exec(
         document.querySelector('[aria-label="Issue options"]')!.parentElement!
           .parentElement!.innerText,
       )![0];
