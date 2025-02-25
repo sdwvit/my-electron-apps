@@ -63,4 +63,4 @@ async function start(address: string) {
   }
 }
 
-start("https://linear.app/noibu/team/NOI/all");
+start("https://linear.app/noibu/view/82306b88-3942-4cef-88d8-6d130d4c012a");
