@@ -19,5 +19,6 @@ module.exports = {
       tsconfig: path.join(process.cwd(), "../tsconfig.json"), // Pointing to tsconfig.json one level up
     }),
   ],
-  external: [], // List any external dependencies
+  // Keep Electron as a runtime dependency so it isn't bundled into bundle.js.
+  external: ["electron"], // List any external dependencies
 };
