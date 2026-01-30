@@ -1,6 +1,7 @@
 const typescript = require("@rollup/plugin-typescript");
 const resolve = require("@rollup/plugin-node-resolve");
 const commonjs = require("@rollup/plugin-commonjs");
+const json = require("@rollup/plugin-json");
 const path = require("node:path");
 
 module.exports = {
@@ -13,6 +14,7 @@ module.exports = {
   plugins: [
     resolve(), // Resolve node_modules dependencies
     commonjs(), // Convert CommonJS modules to ES6
+    json(), // Allow importing JSON (dotenv package.json)
     typescript({
       tsconfig: path.join(process.cwd(), "../tsconfig.json"), // Pointing to tsconfig.json one level up
     }),

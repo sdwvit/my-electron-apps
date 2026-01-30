@@ -1,0 +1,11 @@
+packages:
+  - ChatGPT
+  - GCP
+  - Gitlab
+  - Gmail
+  - Linear
+  - Notion
+  - Whatsup
+
+ignoredBuiltDependencies:
+  - electron

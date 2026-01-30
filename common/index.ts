@@ -1,7 +1,14 @@
 import { app, BrowserWindow } from "electron";
 import { createWindow } from "./createWindow";
+import dotenv from "dotenv";
 
 export function commonAppLifecycle(address: string, customItems: any[]) {
+  dotenv.config();
+  const userDataPath = process.env.CHROMIUM_USER_DATA_PATH;
+  if (userDataPath) {
+    app.setPath("userData", userDataPath);
+  }
+
   // Start the app
   const winPr = app.whenReady().then(() => createWindow(address, customItems));
 
