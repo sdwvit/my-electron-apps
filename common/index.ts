@@ -2,7 +2,11 @@ import { app, BrowserWindow } from "electron";
 import { createWindow } from "./createWindow";
 import dotenv from "dotenv";
 
-export function commonAppLifecycle(address: string, customItems: any[]) {
+export function commonAppLifecycle(
+  address: string,
+  customItems: any[],
+  userAgent?: string,
+) {
   dotenv.config();
   const userDataPath = process.env.CHROMIUM_USER_DATA_PATH;
   if (userDataPath) {
@@ -10,7 +14,9 @@ export function commonAppLifecycle(address: string, customItems: any[]) {
   }
 
   // Start the app
-  const winPr = app.whenReady().then(() => createWindow(address, customItems));
+  const winPr = app
+    .whenReady()
+    .then(() => createWindow(address, customItems, userAgent));
 
   app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
