@@ -7,4 +7,4 @@ async function start(address: string) {
   state.win = await commonAppLifecycle(address, []);
 }
 
-start("https://web.telegram.org/");
+start("https://web.telegram.org/a/");

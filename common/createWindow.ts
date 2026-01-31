@@ -39,6 +39,25 @@ export function createWindow(address: string, additionalContextMenu: any[]) {
       });
     `);
   });
+  win.webContents.on("before-input-event", (event, input) => {
+    const isModifier = input.control || input.meta;
+    if (!isModifier || input.type !== "keyDown") {
+      return;
+    }
+
+    if (input.key === "+" || input.key === "=") {
+      event.preventDefault();
+      const current = win.webContents.getZoomFactor();
+      win.webContents.setZoomFactor(Math.min(current + 0.1, 3));
+      return;
+    }
+
+    if (input.key === "-" || input.key === "_") {
+      event.preventDefault();
+      const current = win.webContents.getZoomFactor();
+      win.webContents.setZoomFactor(Math.max(current - 0.1, 0.25));
+    }
+  });
 
   // Custom context menu
   win.webContents.on("context-menu", (event, params) => {
