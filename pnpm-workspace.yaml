@@ -1,10 +1,12 @@
 packages:
   - ChatGPT
+  - Discord
   - GCP
   - Gitlab
   - Gmail
   - Linear
   - Notion
+  - Telegram
   - Whatsup
 
 ignoredBuiltDependencies:

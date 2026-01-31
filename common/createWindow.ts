@@ -1,10 +1,11 @@
-import { BrowserWindow, MenuItem, ipcMain } from "electron";
+import { app, BrowserWindow, MenuItem, ipcMain } from "electron";
 import { addSearch } from "./addSearch";
 import { createContextMenu } from "./createContextMenu";
 import { handleExternalLinks } from "./handleExternalLinks";
-import { session } from "electron";
 
 export function createWindow(address: string, additionalContextMenu: any[]) {
+  const userAgentOverride = process.env.USER_AGENT_OVERRIDE?.trim();
+  const userAgent = userAgentOverride || app.userAgentFallback;
   const win = new BrowserWindow({
     width: 1024,
     height: 800,
@@ -61,15 +62,7 @@ export function createWindow(address: string, additionalContextMenu: any[]) {
     newWindow.loadURL(url || address);
   });
 
-  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-    details.requestHeaders["User-Agent"] =
-      "Mozilla/5.0 (X11; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0";
-    callback({ cancel: false, requestHeaders: details.requestHeaders });
-  });
-
-  win.loadURL(address, {
-    userAgent:
-      "Mozilla/5.0 (X11; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0",
-  });
+  win.webContents.setUserAgent(userAgent);
+  win.loadURL(address, { userAgent });
   return win;
 }

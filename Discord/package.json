@@ -1,0 +1,17 @@
+{
+  "name": "discord-electron",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bundle.js",
+  "scripts": {
+    "package": "electron-packager --platform=linux --arch=x64 --overwrite . --prune=false",
+    "prepackage": "rollup -c ../rollup.config.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@electron/get": "^2.0.3",
+    "electron": "^39.4.0",
+    "electron-packager": "^17.1.2"
+  }
+}
