@@ -12,7 +12,10 @@ async function start(address: string) {
         ),
     },
   ].filter(Boolean);
-  state.win = await commonAppLifecycle(address, customItems);
+  state.win = await commonAppLifecycle(address, customItems, undefined, {
+    iconFile: "Linear.svg",
+    tooltip: "Linear",
+  });
 
   function generateScript() {
     return () => {

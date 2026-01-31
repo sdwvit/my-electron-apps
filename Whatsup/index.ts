@@ -8,6 +8,10 @@ async function start(address: string) {
     address,
     [],
     "Mozilla/5.0 (X11; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0",
+    {
+      iconFile: "Whatsup.png",
+      tooltip: "WhatsApp",
+    },
   );
 }
 

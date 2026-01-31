@@ -14,7 +14,10 @@ async function start(address: string) {
         ),
     },
   ].filter(Boolean);
-  state.win = await commonAppLifecycle(address, customItems);
+  state.win = await commonAppLifecycle(address, customItems, undefined, {
+    iconFile: "Gitlab.svg",
+    tooltip: "GitLab",
+  });
 
   async function assignReviewers() {
     return new Promise((r) => setTimeout(r, 300)); // todo skip for now
