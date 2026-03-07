@@ -76,6 +76,7 @@ const buildTelegramPrimaryVars = (base: Rgb) => {
   const shade = base.map((channel) => clampByte(channel * 0.88)) as Rgb;
   return {
     "--color-primary": `rgb(${r}, ${g}, ${b})`,
+    "--color-chat-active": `rgb(${r}, ${g}, ${b})`,
     "--color-primary-opacity": `rgba(${r}, ${g}, ${b}, 0.118)`,
     "--color-primary-opacity-hover": `rgba(${r}, ${g}, ${b}, 0.251)`,
     "--color-primary-tint": `rgba(${r}, ${g}, ${b}, 0.102)`,
@@ -93,6 +94,14 @@ const applyTelegramPrimaryVars = (win: BrowserWindow, base: Rgb) => {
       if (!root) return;
       for (const [key, value] of Object.entries(vars)) {
         root.style.setProperty(key, value);
+      }
+
+      const styleId = 'telegram-message-max-width-override';
+      if (!document.getElementById(styleId)) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = \`.Message { --max-width: 35vw !important; }\`;
+        document.head?.appendChild(style);
       }
     })();
   `;

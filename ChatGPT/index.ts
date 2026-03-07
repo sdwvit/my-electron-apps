@@ -5,7 +5,7 @@ async function start(address: string) {
   const state: { win?: BrowserWindow } = {};
 
   state.win = await commonAppLifecycle(address, [], undefined, {
-    iconFile: "ChatGPT.svg",
+    iconFile: "ChatGPT.png",
     tooltip: "ChatGPT",
   });
 }
