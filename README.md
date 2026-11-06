@@ -43,6 +43,7 @@ pnpm run package
 - Rollup bundles `index.ts` into `bundle.js` using the root `rollup.config.js`.
 - Electron Packager creates `*-electron-linux-x64/` in the app folder.
 - A Linux `.desktop` file is generated for each app in `~/.local/share/applications/`.
+  The launcher runs the app under XWayland (`--ozone-platform=x11`) to avoid a drag-and-drop freeze on KDE Wayland; set `ELECTRON_OZONE_PLATFORM=wayland` before `pnpm package` to run natively.
 
 ## Configuration
 - `CHROMIUM_USER_DATA_PATH`: Optional env var to override Electron's user data directory.

@@ -10,8 +10,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@electron/get": "^2.0.3",
-    "electron": "^39.4.0",
-    "electron-packager": "^17.1.2"
+    "@electron/get": "^5.1.0",
+    "electron": "^45.2.3",
+    "@electron/packager": "^20.3.0"
   }
 }
