@@ -1,12 +1,14 @@
-import { BrowserWindow, shell } from "electron";
+import { WebContents } from "electron";
+import { isInternalUrl, openExternal } from "./urls";
 
 export function handleExternalLinks(
   event: Electron.Event<{}>,
   url: string,
-  win: BrowserWindow,
+  webContents: WebContents,
 ) {
-  if (url !== win.webContents.getURL() && !/auth|sign_in|gitlab|account|chatgpt/.test(url)) {
-    event.preventDefault();
-    shell.openExternal(url);
+  if (url === webContents.getURL() || isInternalUrl(url)) {
+    return;
   }
+  event.preventDefault();
+  openExternal(url);
 }

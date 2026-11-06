@@ -1,92 +1,110 @@
-import { app, session, BrowserWindow, MenuItem, ipcMain } from "electron";
-import { addSearch } from "./addSearch";
+import {
+  BrowserWindow,
+  BrowserWindowConstructorOptions,
+  ipcMain,
+} from "electron";
+import { getAppConfig } from "./config";
 import { createContextMenu } from "./createContextMenu";
+import { trackFindResults } from "./findBar";
 import { handleExternalLinks } from "./handleExternalLinks";
+import { attachShortcuts } from "./shortcuts";
+import { displayUrl, isInternalUrl, isOffHome, openExternal } from "./urls";
+import { restoredBounds, trackWindowState } from "./windowState";
+import { trackZoom } from "./zoom";
 
-export function createWindow(
-  address: string,
-  additionalContextMenu: any[],
-  userAgent?: string,
-) {
+const baseOptions: BrowserWindowConstructorOptions = {
+  width: 1024,
+  height: 800,
+  frame: true,
+  transparent: true,
+  autoHideMenuBar: true,
+  webPreferences: {
+    nodeIntegration: false,
+    contextIsolation: true,
+    spellcheck: true,
+  },
+};
+
+/**
+ * Status bubble text: the hovered link, otherwise the page URL when it is on a
+ * different site than the app's home page.
+ */
+const attachStatusBubble = (win: BrowserWindow) => {
+  const wc = win.webContents;
+  let hoverUrl = "";
+  const update = () => {
+    if (wc.isDestroyed()) {
+      return;
+    }
+    const page = wc.getURL();
+    const text = hoverUrl || (isOffHome(page) ? page : "");
+    wc.send("qol:status", text ? displayUrl(text) : "");
+  };
+  wc.on("update-target-url", (_event, url) => {
+    hoverUrl = url;
+    update();
+  });
+  wc.on("did-navigate", update);
+  wc.on("did-navigate-in-page", (_e, _url, isMainFrame) => {
+    if (isMainFrame) update();
+  });
+  wc.on("dom-ready", update);
+};
+
+/** Everything a window needs, for app windows and page-opened popups alike. */
+export const attachWindow = (win: BrowserWindow) => {
+  const wc = win.webContents;
+  const { userAgent } = getAppConfig();
+  if (userAgent) {
+    wc.setUserAgent(userAgent);
+  }
+
+  wc.on("will-navigate", (event, url) => handleExternalLinks(event, url, wc));
+
+  wc.setWindowOpenHandler(({ url, disposition }) => {
+    // about:blank popups are usually sign-in or print flows that need window.opener.
+    if (url === "about:blank" || isInternalUrl(url)) {
+      const isTab = disposition !== "new-window";
+      return {
+        action: "allow",
+        overrideBrowserWindowOptions: {
+          autoHideMenuBar: true,
+          ...(isTab ? { width: 1024, height: 800 } : {}),
+        },
+      };
+    }
+    openExternal(url);
+    return { action: "deny" };
+  });
+  wc.on("did-create-window", (child) => attachWindow(child));
+
+  wc.on("context-menu", (_event, params) => {
+    createContextMenu(wc, params, createWindow).popup({ window: win });
+  });
+
+  attachShortcuts(win, wc);
+  attachStatusBubble(win);
+  trackFindResults(win);
+  trackZoom(wc);
+};
+
+export function createWindow(url?: string, options: { main?: boolean } = {}) {
+  const { homeUrl, userAgent } = getAppConfig();
   const win = new BrowserWindow({
-    width: 1024,
-    height: 800,
-    frame: true,
-    transparent: true,
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-    },
+    ...baseOptions,
+    ...(options.main ? restoredBounds() : {}),
   });
-
-  const state: { win: any } = { win };
-  addSearch(state);
-
-  // Event listeners for external links
-  win.webContents.on("will-navigate", (event, url) =>
-    handleExternalLinks(event, url, win),
-  );
-  win.webContents.on(
-    "new-window" as any,
-    (event: Electron.Event<{}>, url: string) =>
-      handleExternalLinks(event, url, win),
-  );
-  // Inject middle-click handler into the loaded content
-  win.webContents.on("did-finish-load", () => {
-    win.webContents.executeJavaScript(`
-      window.addEventListener('auxclick', (event) => {
-        if (event.button === 1) {
-          window.ipcRenderer.send('open-new-window', { url: window.location.href });
-        }
-      });
-    `);
-  });
-  win.webContents.on("before-input-event", (event, input) => {
-    const isModifier = input.control || input.meta;
-    if (!isModifier || input.type !== "keyDown") {
-      return;
-    }
-
-    if (input.key === "+" || input.key === "=") {
-      event.preventDefault();
-      const current = win.webContents.getZoomFactor();
-      win.webContents.setZoomFactor(Math.min(current + 0.1, 3));
-      return;
-    }
-
-    if (input.key === "-" || input.key === "_") {
-      event.preventDefault();
-      const current = win.webContents.getZoomFactor();
-      win.webContents.setZoomFactor(Math.max(current - 0.1, 0.25));
-    }
-  });
-
-  // Custom context menu
-  win.webContents.on("context-menu", (event, params) => {
-    const menu = createContextMenu(
-      win,
-      params,
-      address,
-      additionalContextMenu,
-      createWindow,
-    );
-    additionalContextMenu.forEach((item: any) =>
-      menu.append(new MenuItem(item)),
-    );
-    menu.popup();
-  });
-
-  ipcMain.on("open-new-window", (event, params) => {
-    const { url } = params;
-    const newWindow = createWindow(url, additionalContextMenu);
-
-    newWindow.loadURL(url || address, { userAgent });
-  });
-  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-    if (userAgent) details.requestHeaders["User-Agent"] = userAgent;
-    callback({ cancel: false, requestHeaders: details.requestHeaders });
-  });
-  if (userAgent) win.webContents.setUserAgent(userAgent);
-  win.loadURL(address, { userAgent });
+  if (options.main) {
+    trackWindowState(win);
+  }
+  attachWindow(win);
+  win.loadURL(url || homeUrl, { userAgent });
   return win;
 }
+
+/** IPC from the preload, shared by all windows. Call once. */
+export const setupWindowIpc = () => {
+  ipcMain.on("qol:open-new-window", (event) => {
+    createWindow(event.sender.getURL());
+  });
+};

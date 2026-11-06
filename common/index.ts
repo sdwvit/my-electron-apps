@@ -1,12 +1,24 @@
-import { app, BrowserWindow, Menu, Tray, nativeImage } from "electron";
-import { createWindow } from "./createWindow";
+import {
+  app,
+  BrowserWindow,
+  Menu,
+  MenuItemConstructorOptions,
+  Tray,
+  nativeImage,
+  session,
+} from "electron";
+import { setupAppMenu } from "./appMenu";
+import { setAppConfig } from "./config";
+import { createWindow, setupWindowIpc } from "./createWindow";
+import { setupDownloads } from "./downloads";
+import { setupFindBar } from "./findBar";
 import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 
 export function commonAppLifecycle(
   address: string,
-  customItems: any[],
+  customItems: MenuItemConstructorOptions[],
   userAgent?: string,
   trayOptions?: {
     iconFile?: string;
@@ -26,7 +38,8 @@ export function commonAppLifecycle(
     return Promise.resolve(undefined);
   }
 
-  dotenv.config();
+  dotenv.config({ quiet: true });
+  setAppConfig({ homeUrl: address, customItems, userAgent });
   const userDataPath = process.env.CHROMIUM_USER_DATA_PATH;
   if (userDataPath) {
     app.setPath("userData", userDataPath);
@@ -257,8 +270,31 @@ export function commonAppLifecycle(
   };
 
   // Start the app
+  const setupSession = () => {
+    // preload.js sits next to bundle.js; it adds the status bubble and middle-click.
+    session.defaultSession.registerPreloadScript({
+      id: "electron-apps-qol",
+      type: "frame",
+      filePath: path.join(app.getAppPath(), "preload.js"),
+      matches: ["https://*/*", "http://*/*"],
+    });
+    if (userAgent) {
+      session.defaultSession.webRequest.onBeforeSendHeaders(
+        (details, callback) => {
+          details.requestHeaders["User-Agent"] = userAgent;
+          callback({ cancel: false, requestHeaders: details.requestHeaders });
+        },
+      );
+    }
+    setupAppMenu();
+    setupFindBar();
+    setupWindowIpc();
+    setupDownloads();
+  };
+
   const winPr = app.whenReady().then(() => {
-    currentWin = createWindow(address, customItems, userAgent);
+    setupSession();
+    currentWin = createWindow(address, { main: true });
     setupTray(currentWin);
     attachCloseToTray(currentWin);
     return currentWin;
@@ -283,7 +319,7 @@ export function commonAppLifecycle(
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      currentWin = createWindow(address, customItems, userAgent);
+      currentWin = createWindow(address, { main: true });
       setupTray(currentWin);
       attachCloseToTray(currentWin);
     }
